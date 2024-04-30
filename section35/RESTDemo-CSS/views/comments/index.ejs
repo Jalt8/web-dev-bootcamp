@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/css/stylesheet.css">
 </head>
 <body>
     <h1>COMMENTS</h1>
@@ -11,7 +12,7 @@
         <% for (let c of commentData ) { %>
             <li> <%= c.comment %> <b> <%= c.username %> </b> <a href="/comments/<%= c.id %>">details</a></li>
         <% } %> 
- </ul>
- <a href="/comments/new">New Comment</a>
+    </ul>
+    <a href="/comments/new">New Comment</a>
 </body>
 </html>
