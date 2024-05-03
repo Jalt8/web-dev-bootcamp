@@ -2,8 +2,16 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const mongoose = require('mongoose');
-// const Product = require('./models/product')
+const Campground = require('./models/campground')
 const methodOverride = require('method-override')
+
+mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
+    .then(() => {
+        console.log("MONGO CONNECTION OPEN!!!")
+    }).catch(err => {
+        console.log("OH NO MONGO sCONNECTION ERROR!")
+        console.log(err)
+    })
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -18,14 +26,18 @@ app.get('/yelpcamp', async (req, res) => {
     res.render("home.ejs")
 })
 
-app.post('', async (req, res) => {
-    
+app.post('/yelpcamp', async (req, res) => {
+    console.log(req.body)
+    const newCampground = new Campground(req.body)
+    await newCampground.save()
+    //res.redirect(`products/${newProduct.id}`)
+    res.send("Success")
 })
 
 app.put('', async (req, res) => {
-    
+
 })
 
 app.delete('', async (req, res) => {
-    
+
 })
