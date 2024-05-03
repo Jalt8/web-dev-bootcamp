@@ -27,6 +27,10 @@ app.get('/campgrounds', async (req, res) => {
     res.render("index.ejs", { campgrounds })
 })
 
+app.get('/campgrounds/new', async (req, res) => {
+    res.render("new.ejs")
+})
+
 app.get('/campgrounds/:id', async (req, res) => {
     const { id } = req.params
     const campground = await Campground.findById(id)
@@ -41,12 +45,11 @@ app.get("/products/:id", async (req, res) => {
     res.render('products/show', { product })
 })
 
-app.post('/yelpcamp', async (req, res) => {
+app.post('/campgrounds', async (req, res) => {
     console.log(req.body)
     const newCampground = new Campground(req.body)
     await newCampground.save()
-    //res.redirect(`products/${newProduct.id}`)
-    res.send("Success")
+    res.redirect(`campgrounds/${newCampground.id}`)
 })
 
 app.put('', async (req, res) => {
