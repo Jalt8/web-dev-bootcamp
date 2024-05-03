@@ -38,11 +38,11 @@ app.get('/campgrounds/:id', async (req, res) => {
 
 })
 
-app.get("/products/:id", async (req, res) => {
+app.get('/campgrounds/:id/edit', async (req, res) => {
     const { id } = req.params
-    const product = await Product.findById(id)
-    console.log(product)
-    res.render('products/show', { product })
+    const campground = await Campground.findById(id)
+    res.render('edit.ejs', { campground })
+
 })
 
 app.post('/campgrounds', async (req, res) => {
@@ -52,8 +52,10 @@ app.post('/campgrounds', async (req, res) => {
     res.redirect(`campgrounds/${newCampground.id}`)
 })
 
-app.put('', async (req, res) => {
-
+app.put('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params
+    const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true })
+    res.redirect(`/campgrounds/${campground.id}`)
 })
 
 app.delete('', async (req, res) => {
