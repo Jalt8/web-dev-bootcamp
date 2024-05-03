@@ -22,8 +22,9 @@ app.listen(3000, () => {
     console.log("RUNNING ON PORT 3000!")
 })
 
-app.get('/yelpcamp', async (req, res) => {
-    res.render("home.ejs")
+app.get('/campgrounds', async (req, res) => {
+    const campgrounds = await Campground.find()
+    res.render("index.ejs", { campgrounds })
 })
 
 app.post('/yelpcamp', async (req, res) => {
