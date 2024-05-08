@@ -5,8 +5,10 @@ const mongoose = require('mongoose');
 const Campground = require('./models/campground')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
+const Joi = require('joi')
 const AppError = require('./utils/AppError');
 const wrapAsync = require('./utils/catchasync')
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
     .then(() => {
@@ -26,16 +28,16 @@ app.listen(3000, () => {
     console.log("RUNNING ON PORT 3000!")
 })
 
-app.get('/campgrounds', wrapAsync(async (req, res) => {
+app.get('/campgrounds', wrapAsync(async (req, res, next) => {
     const campgrounds = await Campground.find()
     res.render("campgrounds/index.ejs", { campgrounds })
 }))
 
-app.get('/campgrounds/new', wrapAsync(async (req, res) => {
+app.get('/campgrounds/new', wrapAsync(async (req, res, next) => {
     res.render("campgrounds/new.ejs")
 }))
 
-app.get('/campgrounds/:id', wrapAsync(async (req, res) => {
+app.get('/campgrounds/:id', wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findById(id)
     if (!campground) {
@@ -44,7 +46,7 @@ app.get('/campgrounds/:id', wrapAsync(async (req, res) => {
     res.render('campgrounds/show.ejs', { campground })
 }))
 
-app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
+app.get('/campgrounds/:id/edit', wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findById(id)
     if (!campground) {
@@ -53,16 +55,29 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
     res.render('campgrounds/edit.ejs', { campground })
 }))
 
-app.post('/campgrounds', wrapAsync(async (req, res) => {
-    const newCampground = new Campground(req.body)
-    await newCampground.save()
-    if (!req.body) {
-        return next(new AppError('No request body', 404));
-    }
-    res.redirect(`campgrounds/${newCampground.id}`)
-}))
+app.post('/campgrounds', wrapAsync(async (req, res, next) => {
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+            image: Joi.string().required(),
+            location: Joi.string().required(),
+            description: Joi.string().required()
+        }).required()
+    });
 
-app.put('/campgrounds/:id', wrapAsync(async (req, res) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        return next(new AppError(msg, 400));
+    }
+
+    const newCampground = new Campground(req.body.campground);
+    await newCampground.save();
+    res.redirect(`/campgrounds/${newCampground.id}`);
+}));
+
+app.put('/campgrounds/:id', wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true })
     if (!campground) {
@@ -71,7 +86,7 @@ app.put('/campgrounds/:id', wrapAsync(async (req, res) => {
     res.redirect(`/campgrounds/${campground.id}`)
 }))
 
-app.delete('/campgrounds/:id', wrapAsync(async (req, res) => {
+app.delete('/campgrounds/:id', wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndDelete(id)
     if (!campground) {
@@ -98,6 +113,9 @@ app.all(('*'), (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    const { status = 500, message = 'Something Went Wrong' } = err
-    res.status(status).send(message)
+    const { status = 500 } = err
+    if (!err.message) {
+        err.message = 'Something Went Wrong'
+    }
+    res.status(status).render('error.ejs', { err })
 })
