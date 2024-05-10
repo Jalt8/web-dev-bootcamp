@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 const Campground = require('./models/campground')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
-const Joi = require('joi')
 const AppError = require('./utils/AppError');
 const wrapAsync = require('./utils/catchasync')
+const { campgroundSchema } = require('./schemas')
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -23,6 +23,16 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+
+const validateCampground = (req, res, next) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        return next(new AppError(msg, 400));
+    } else {
+        next();
+    }
+}
 
 app.listen(3000, () => {
     console.log("RUNNING ON PORT 3000!")
@@ -55,29 +65,13 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res, next) => {
     res.render('campgrounds/edit.ejs', { campground })
 }))
 
-app.post('/campgrounds', wrapAsync(async (req, res, next) => {
-    const campgroundSchema = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0),
-            image: Joi.string().required(),
-            location: Joi.string().required(),
-            description: Joi.string().required()
-        }).required()
-    });
-
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        return next(new AppError(msg, 400));
-    }
-
+app.post('/campgrounds', validateCampground, wrapAsync(async (req, res, next) => {
     const newCampground = new Campground(req.body.campground);
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground.id}`);
 }));
 
-app.put('/campgrounds/:id', wrapAsync(async (req, res, next) => {
+app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true })
     if (!campground) {

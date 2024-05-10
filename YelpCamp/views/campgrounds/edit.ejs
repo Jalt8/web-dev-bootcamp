@@ -7,7 +7,7 @@
                 id="form-edit">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title:</label>
-                    <input class="form-control" type="text" name="title" id="title" value="<%= campground.title %>"
+                    <input class="form-control" type="text" name="campground[title]" id="title" value="<%= campground.title %>"
                         required>
                     <div class="valid-feedback">
                         Looks good!
@@ -20,7 +20,7 @@
                     <label class="form-label" for="price">Price:</label>
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon1">$</span>
-                        <input class="form-control" type="text" name="price" id="price" value="<%= campground.price %>"
+                        <input class="form-control" type="text" name="campground[price]" id="price" value="<%= campground.price %>"
                             required>
                         <div class="valid-feedback">
                             Looks good!
@@ -32,7 +32,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location:</label>
-                    <input class="form-control" type="text" name="location" id="location"
+                    <input class="form-control" type="text" name="campground[location]" id="location"
                         value="<%= campground.location %>" required>
                     <div class="valid-feedback">
                         Looks good!
@@ -43,7 +43,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="description">Image Url:</label>
-                    <input class="form-control" type="text" name="image" id="image" value="<%= campground.image %>"
+                    <input class="form-control" type="text" name="campground[image]" id="image" value="<%= campground.image %>"
                         required>
                     <div class="valid-feedback">
                         Looks good!
@@ -54,7 +54,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="description">Description:</label>
-                    <textarea class="form-control" type="text" name="description" id="description"
+                    <textarea class="form-control" type="text" name="campground[description]" id="description"
                         required><%= campground.description %></textarea>
                     <div class="valid-feedback">
                         Looks good!
