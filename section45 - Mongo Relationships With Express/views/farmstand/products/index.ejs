@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=A, initial-scale=1.0">
-    <title>All Products</title>
-</head>
-
-<body>
+<% layout('./layouts/boilerplate') %>
     <h1>
         <%= category %> Products!
     </h1>
@@ -24,6 +15,3 @@
     <% if(category !='All' ) { %>
         <a href="/products">All Products</a>
         <% } %>
-</body>
-
-</html>

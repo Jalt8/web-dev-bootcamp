@@ -73,7 +73,7 @@ app.post('/campgrounds', validateCampground, wrapAsync(async (req, res, next) =>
 
 app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res, next) => {
     const { id } = req.params
-    const campground = await Campground.findByIdAndUpdate(id, req.body, { runValidators: true, new: true })
+    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true })
     if (!campground) {
         return next(new AppError('Campground Not Found', 404));
     }
