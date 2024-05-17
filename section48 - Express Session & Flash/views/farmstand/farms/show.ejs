@@ -1,0 +1,29 @@
+<% layout('/layouts/boilerplate') %>
+<%= messages %>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%= farm.name %>
+                    </h5>
+                    <p class="card-text">
+                        <%= farm.city %>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <%= farm.email %>
+                    </li>
+                </ul>
+
+                <div class="card-body">
+                    <a href="/farms/<%= farm.id %>/edit" class="card-link btn btn-info">Edit</a>
+                    <form action="/farms/<%= farm.id %>?_method=DELETE" method="POST" class="d-inline">
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
