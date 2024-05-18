@@ -1,14 +1,20 @@
-const express = require('express')
-const app = express()
-const path = require('path')
+const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
-const Review = require('./models/review')
-const Campground = require('./models/campground')
-const methodOverride = require('method-override')
-const ejsMate = require('ejs-mate')
+const methodOverride = require('method-override');
+const ejsMate = require('ejs-mate');
+const session = require('express-session');
+const flash = require('connect-flash');
 const AppError = require('./utils/AppError');
-const wrapAsync = require('./utils/catchasync')
-const { campgroundSchema, reviewSchema } = require('./schemas')
+const wrapAsync = require('./utils/catchasync');
+const { campgroundSchema, reviewSchema } = require('./schemas');
+const Review = require('./models/review');
+const Campground = require('./models/campground');
+
+const campgrounds = require('./routes/campgrounds');
+const reviews = require('./routes/reviews');
+
+const app = express();
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -24,102 +30,33 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+app.use(express.static(path.join(__dirname, 'public')))
 
-const validateCampground = (req, res, next) => {
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        return next(new AppError(msg, 400));
-    } else {
-        next();
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret!',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
-}
+};
+app.use(session(sessionConfig));
+app.use(flash());
 
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    console.log(error)
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        return next(new AppError(msg, 400));
-    } else {
-        next();
-    }
-}
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 app.listen(3000, () => {
     console.log("RUNNING ON PORT 3000!")
 })
 
-app.get('/campgrounds', wrapAsync(async (req, res, next) => {
-    const campgrounds = await Campground.find()
-    res.render("campgrounds/index.ejs", { campgrounds })
-}))
-
-app.get('/campgrounds/new', wrapAsync(async (req, res, next) => {
-    res.render("campgrounds/new.ejs")
-}))
-
-app.get('/campgrounds/:id', wrapAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id).populate('reviews');
-    if (!campground) {
-        return next(new AppError('Campground Not Found', 404));
-    }
-    res.render('campgrounds/show.ejs', { campground });
-}));
-
-app.get('/campgrounds/:id/edit', wrapAsync(async (req, res, next) => {
-    const { id } = req.params
-    const campground = await Campground.findById(id)
-    if (!campground) {
-        return next(new AppError('Campground Not Found', 404));
-    }
-    res.render('campgrounds/edit.ejs', { campground })
-}))
-
-app.post('/campgrounds', validateCampground, wrapAsync(async (req, res, next) => {
-    const newCampground = new Campground(req.body.campground);
-    await newCampground.save();
-    res.redirect(`/campgrounds/${newCampground.id}`);
-}));
-
-app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res, next) => {
-    const { id } = req.params
-    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true })
-    if (!campground) {
-        return next(new AppError('Campground Not Found', 404));
-    }
-    res.redirect(`/campgrounds/${campground.id}`)
-}))
-
-app.delete('/campgrounds/:id', wrapAsync(async (req, res, next) => {
-    const { id } = req.params
-    const campground = await Campground.findByIdAndDelete(id)
-    if (!campground) {
-        return next(new AppError('Campground Not Found', 404));
-    }
-    res.redirect(`/campgrounds`)
-}))
-
-app.delete('/campgrounds/:id/reviews/:reviewId', wrapAsync(async (req, res, next) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}));
-
-app.post('/campgrounds/:id/reviews',validateReview, wrapAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id);
-    if (!campground) {
-        return next(new AppError('Campground Not Found', 404));
-    }
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground.id}`);
-}));
+app.use('/campgrounds', campgrounds);
+app.use('/campgrounds/:id/reviews', reviews);
 
 const handleCastErr = err => {
     console.dir(err);
@@ -128,11 +65,12 @@ const handleCastErr = err => {
 }
 
 app.use((err, req, res, next) => {
-    console.log(err.name);
-    //We can single out particular types of Mongoose Errors:
-    if (err.name === 'CastError') err = handleCastErr(err)
+    if (err.name === 'CastError') {
+        req.flash('error', 'Invalid Campground ID.');
+        return res.redirect('/campgrounds');
+    }
     next(err);
-})
+});
 
 app.all(('*'), (req, res, next) => {
     next(new AppError('Page Not Found'), 404)
