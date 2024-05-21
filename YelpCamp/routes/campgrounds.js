@@ -4,6 +4,10 @@ const wrapAsync = require('../utils/catchasync');
 const AppError = require('../utils/AppError');
 const Campground = require('../models/campground');
 const { campgroundSchema, reviewSchema } = require('../schemas');
+const middleware = require('../middleware');
+
+
+const { isLoggedIn } = middleware;
 
 const validateCampground = (req, res, next) => {
     const { error } = campgroundSchema.validate(req.body);
@@ -20,7 +24,7 @@ router.get('/', wrapAsync(async (req, res, next) => {
     res.render("campgrounds/index.ejs", { campgrounds })
 }))
 
-router.get('/new', wrapAsync(async (req, res, next) => {
+router.get('/new',isLoggedIn, wrapAsync(async (req, res, next) => {
     res.render("campgrounds/new.ejs")
 }))
 
@@ -33,7 +37,7 @@ router.get('/:id', wrapAsync(async (req, res, next) => {
     res.render('campgrounds/show.ejs', { campground });
 }));
 
-router.get('/:id/edit', wrapAsync(async (req, res, next) => {
+router.get('/:id/edit', isLoggedIn, wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findById(id)
     if (!campground) {
@@ -42,14 +46,14 @@ router.get('/:id/edit', wrapAsync(async (req, res, next) => {
     res.render('campgrounds/edit.ejs', { campground })
 }))
 
-router.post('/', validateCampground, wrapAsync(async (req, res, next) => {
+router.post('/', isLoggedIn, validateCampground, wrapAsync(async (req, res, next) => {
     req.flash('success', 'Successfully made a new campground!');
     const newCampground = new Campground(req.body.campground);
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground.id}`);
 }));
 
-router.put('/:id', validateCampground, wrapAsync(async (req, res, next) => {
+router.put('/:id', isLoggedIn, validateCampground, wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true })
     if (!campground) {
@@ -59,7 +63,7 @@ router.put('/:id', validateCampground, wrapAsync(async (req, res, next) => {
     res.redirect(`/campgrounds/${campground.id}`)
 }))
 
-router.delete('/:id', wrapAsync(async (req, res, next) => {
+router.delete('/:id', isLoggedIn, wrapAsync(async (req, res, next) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndDelete(id)
     if (!campground) {
