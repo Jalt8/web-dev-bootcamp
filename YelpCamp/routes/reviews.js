@@ -8,11 +8,11 @@ const { campgroundSchema, reviewSchema } = require('../schemas');
 const middleware = require('../utils/middleware');
 
 
-const { isLoggedIn, validateReview, isAuthor } = middleware;
+const { isLoggedIn, validateReview, isAuthor, isReviewAuthor } = middleware;
 
-router.delete('/:reviewId', isLoggedIn, isAuthor, wrapAsync(async (req, res, next) => {
+router.delete('/:reviewId', isLoggedIn, isReviewAuthor, wrapAsync(async (req, res, next) => {
     const { id, reviewId } = req.params;
-    
+
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
     req.flash('success', 'Successfully deleted review!');
