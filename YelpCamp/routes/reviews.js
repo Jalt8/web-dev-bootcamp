@@ -5,24 +5,14 @@ const AppError = require('../utils/AppError');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
 const { campgroundSchema, reviewSchema } = require('../schemas');
-const middleware = require('../middleware');
+const middleware = require('../utils/middleware');
 
 
-const { isLoggedIn } = middleware;
+const { isLoggedIn, validateReview, isAuthor } = middleware;
 
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    console.log(error)
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        return next(new AppError(msg, 400));
-    } else {
-        next();
-    }
-}
-
-router.delete('/:reviewId', isLoggedIn, wrapAsync(async (req, res, next) => {
+router.delete('/:reviewId', isLoggedIn, isAuthor, wrapAsync(async (req, res, next) => {
     const { id, reviewId } = req.params;
+    
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
     req.flash('success', 'Successfully deleted review!');
@@ -37,6 +27,7 @@ router.post('/', isLoggedIn, validateReview, wrapAsync(async (req, res, next) =>
         return next(new AppError('Campground Not Found', 404));
     }
     const review = new Review(req.body.review);
+    review.author = req.user._id;
     campground.reviews.push(review);
     await review.save();
     await campground.save();
