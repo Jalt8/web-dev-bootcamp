@@ -1,4 +1,11 @@
 <% layout('/layouts/boilerplate') %>
+<script>
+    const mapboxToken = '<%= process.env.MAPBOX_TOKEN %>';
+    const latitude = <%= campground.geometry.coordinates[1] %>;
+    const longitude = <%= campground.geometry.coordinates[0] %>;
+    const title = '<%= campground.title %>';
+    const campLocation = '<%= campground.location %>';
+</script>
 <link rel="stylesheet" type="text/css" href="/css/starability.css"/>
     <div class="row">
         <div class="col-6 ">
@@ -58,6 +65,7 @@
             </div>
         </div>
         <div class="col-6">
+            <div id="map" style="width: 600px; height: 400px;"></div>
             <% if(currentUser) { %>
             <h2>Leave a Review</h2>
             <form action="/campgrounds/<%= campground.id %>/reviews" method="POST" class="validated-form mb-3"
@@ -109,3 +117,5 @@
                 <% } %>
         </div>
     </div>
+
+    <script src="/js/showPageMap.js"></script>
