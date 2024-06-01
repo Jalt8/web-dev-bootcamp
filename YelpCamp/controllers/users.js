@@ -18,7 +18,6 @@ module.exports.createUser = async (req, res, next) => {
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) { return next(err) }
-            console.log('new user:', registeredUser)
             req.flash('success', `Welcome ${username}!`)
             return res.redirect('/campgrounds')
         })

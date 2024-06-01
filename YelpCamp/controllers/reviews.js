@@ -17,7 +17,6 @@ module.exports.deleteReview = async (req, res, next) => {
 
 module.exports.createReview = async (req, res, next) => {
     const { id } = req.params;
-    console.log(req.params);
     const campground = await Campground.findById(id);
     if (!campground) {
         return next(new AppError('Campground Not Found', 404));

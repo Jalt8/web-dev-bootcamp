@@ -1,62 +1,57 @@
 <% layout('/layouts/boilerplate') %>
-    <div class="row">
-        <h1 class="text-center">New Campground</h1>
-        <div class="col-6 offset-3">
-            <form action="/campgrounds" method="POST" novalidate class="validated-form">
-                <div class="mb-3">
-                    <label class="form-label" for="title">Title:</label>
-                    <input class="form-control" type="text" name="campground[title]" id="title" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a title.
-                    </div>
+<div class="row">
+    <h1 class="text-center">New Campground</h1>
+    <div class="col-6 offset-3">
+        <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label" for="title">Title:</label>
+                <input class="form-control" type="text" name="campground[title]" id="title" required>
+                <div class="valid-feedback">
+                    Looks good!
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="price">Price:</label>
-                    <div class="input-group">
-                        <span class="input-group-text" id="basic-addon1">$</span>
-                        <input class="form-control" type="text" name="campground[price]" id="price" required>
-                    </div>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a price.
-                    </div>
+                <div class="invalid-feedback">
+                    Please provide a title.
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="location">Location:</label>
-                    <input class="form-control" type="text" name="campground[location]" id="location" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a location.
-                    </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Price:</label>
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon1">$</span>
+                    <input class="form-control" type="text" name="campground[price]" id="price" required>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="description">Image Url:</label>
-                    <input class="form-control" type="text" name="campground[image]" id="image" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide an image url.
-                    </div>
+                <div class="valid-feedback">
+                    Looks good!
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="description">Description:</label>
-                    <textarea class="form-control" type="text" name="campground[description]" id="description" required></textarea>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a description.
-                    </div>
+                <div class="invalid-feedback">
+                    Please provide a price.
                 </div>
-                <button class="btn btn-success">Submit</button>
-            </form>
-        </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Location:</label>
+                <input class="form-control" type="text" name="campground[location]" id="location" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please provide a location.
+                </div>
+            </div>
+            <div class="mt-3 mb-5 custom-file">
+                <label for="image" class="form-label">Choose Images</label>
+                <input class="form-control" type="file" id="image" name="campground[images]" multiple>
+                <label for="image" class="custom-file-label text-muted" id="imageLabel"></label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Description:</label>
+                <textarea class="form-control" type="text" name="campground[description]" id="description" required></textarea>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please provide a description.
+                </div>
+            </div>
+            <button class="btn btn-success">Submit</button>
+        </form>
     </div>
+</div>
