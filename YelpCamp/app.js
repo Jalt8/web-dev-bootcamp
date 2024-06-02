@@ -70,6 +70,10 @@ app.listen(3000, () => {
     console.log("RUNNING ON PORT 3000!")
 })
 
+app.get('/', async (req, res) => {
+    res.render('home.ejs')
+});
+
 app.get('/fakeUser', async (req, res) => {
     const user = new User({ email: 'test',username: 'jake' });
     const newUser = await User.register(user, 'chicken');
