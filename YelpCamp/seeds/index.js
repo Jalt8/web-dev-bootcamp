@@ -33,7 +33,8 @@ const seedDB = async () => {
               ],
             description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia impedit voluptate earum repudiandae inventore distinctio beatae assumenda officiis veritatis ratione deleniti repellendus non tenetur dignissimos debitis, praesentium accusamus consectetur minima',
             price: 5 + Math.floor(Math.random() * 100),
-            author: '664db39efd835b7720587481'
+            author: '664db39efd835b7720587481',
+            geometry: { type: 'Point', coordinates: [cities[random1000].longitude, cities[random1000].latitude] }
         })
         await camp.save()
     }
