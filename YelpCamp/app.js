@@ -26,7 +26,7 @@ const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 const { name } = require('ejs');
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
-
+const port = process.env.PORT || 3000;
 
 const app = express();
 
@@ -139,8 +139,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.listen(3000, () => {
-    console.log("RUNNING ON PORT 3000!")
+app.listen(port, () => {
+    console.log(`RUNNING ON PORT ${port}!`)
 })
 
 app.get('/', async (req, res) => {
