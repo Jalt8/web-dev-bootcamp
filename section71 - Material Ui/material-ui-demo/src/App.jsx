@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RatingDemo from './RatingDemo';
 import FormDemo from './FormDemo';
-import ButtonAppBar from './Navbar';
+import Navbar from './Navbar';
 
 function App() {
   const [count, setCount] = useState(0)

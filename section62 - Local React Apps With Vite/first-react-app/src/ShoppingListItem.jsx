@@ -4,7 +4,7 @@ function ShoppingListItem({item, quantity, completed}) {
             textDecoration: completed ? 'line-through' : 'none',
             color: completed ? "grey" : "red"
             }}>
-            {quantity} {item}
+            {item} - {quantity}
         </li>
     );
 }
